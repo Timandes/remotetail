@@ -12,6 +12,6 @@
         }
     ],
     "require": {
-        "workerman/workerman": ">=3.3.3",
+        "workerman/workerman": ">=3.3.3"
     }
 }
