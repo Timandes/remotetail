@@ -1,7 +1,7 @@
 {
     "name": "remotetail/remotetail",
     "type": "project",
-    "keywords": ["remote-tail", "tail"]
+    "keywords": ["remote-tail", "tail"],
     "license": "Apache Licence 2.0",
     "description": "Get the last part of files from remote server",
     "authors": [
