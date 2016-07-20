@@ -1,0 +1,17 @@
+{
+    "name": "remotetail/remotetail",
+    "type": "project",
+    "keywords": ["remote-tail", "tail"]
+    "license": "Apache Licence 2.0",
+    "description": "Get the last part of files from remote server",
+    "authors": [
+        {
+            "name": "Timandes White",
+            "email": "timands@gmail.com",
+            "role": "Lead",
+        }
+    ],
+    "require": {
+        "workerman/workerman": ">=3.3.3",
+    }
+}
