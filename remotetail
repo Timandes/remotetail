@@ -1,0 +1,79 @@
+#! /bin/env php
+<?php
+/**
+ * Remote Tail
+ *
+ * @author Timandes White <timands@gmail.com>
+ * @package remotetail/remotetail
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$event = new \Workerman\Events\Event();
+
+//\Workerman\Worker::$logFile = '/dev/null';
+\Workerman\Worker::$stdoutFile = 'out.log';
+\Workerman\Worker::$globalEvent = $event;
+$worker = new \Workerman\Worker("websocket://0.0.0.0:64447");
+
+$connections = array();
+
+//$worker->user = 'nobody';
+$worker->count = 1;
+
+$worker->onConnect = function($connection) use(&$connections) {
+    echo "One client connected#" . $connection->id . PHP_EOL;
+    $connections[$connection->id] = array($connection, null);
+};
+
+$worker->onError = function($connection, $code, $message) {
+    echo "One connection error#" . $connection->id;
+    echo ":#${code} " . $message . PHP_EOL;
+};
+$worker->onClose = function($connection) use(&$connections) {
+    echo "One connection lost#" . $connection->id . PHP_EOL;
+    $id = $connection->id;
+    $connection->close();
+    if (!isset($connections[$id]))
+        return;
+    $meta = $connections[$id];
+    $fileReader = $meta[1];
+    if ($fileReader)
+        $fileReader->stopSurveillance();
+    unset($connections[$id]);
+};
+$worker->onBufferFull = function($connection) use(&$connections) {
+    echo "One connection buffer full#" . $connection->id . PHP_EOL;
+    $id = $connection->id;
+    if (!isset($connections[$id]))
+        return;
+    $meta = $connections[$id];
+    $fileReader = $meta[1];
+    if ($fileReader)
+        $fileReader->onBufferFull();
+};
+$worker->onBufferDrain = function($connection) use(&$connections) {
+    echo "Buffer of connection #" . $connection->id . " drained" . PHP_EOL;
+    $id = $connection->id;
+    if (!isset($connections[$id]))
+        return;
+    $meta = $connections[$id];
+    $fileReader = $meta[1];
+    if ($fileReader)
+        $fileReader->onBufferDrain();
+};
+$worker->onMessage = function($connection, $data) use(&$connections, $event) {
+    $path = $data;
+    if (!file_exists($path)) {
+        $connection->send("Fail to find file ${path}");
+        return;
+    }
+    echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;
+    $fileReader = new FileReader($event, $connection, $path);
+    $connections[$connection->id] = array($connection, $fileReader);
+    $fileReader->beginSurveillance();
+};
+
+\Workerman\Worker::runAll();
+
