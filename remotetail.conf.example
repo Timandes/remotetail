@@ -1,0 +1,11 @@
+<?php
+/**
+ * Configuration for Remote Tail
+ *
+ * @author Timandes White <timands@gmail.com>
+ * @package remotetail/remotetail
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+/** @var int Port number */
+$config['listen_port'] = 8080;
