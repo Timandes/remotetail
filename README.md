@@ -1,4 +1,4 @@
-# remotetail
+# RemoteTail
 Get the last part of files from remote server
 
 ## Requirements
