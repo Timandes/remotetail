@@ -1,4 +1,4 @@
-#! /bin/env php
+#! /usr/bin/env php
 <?php
 /**
  * Remote Tail
@@ -10,12 +10,48 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+if (!defined('EXIT_SUCCESS'))
+    define('EXIT_SUCCESS', 0);
+if (!defined('EXIT_FAILURE'))
+    define('EXIT_FAILURE', 1);
+
+function load_config()
+{
+    $path = __DIR__ . '/remotetail.conf';
+    if (!file_exists($path)) {
+        fprintf(STDERR, "Could not find file %s\n", $path);
+        return false;
+    }
+    include $path;
+
+    return $config;
+}
+
+function dependancy_check()
+{
+    if (!class_exists("EventBase")) {
+        fprintf(STDERR, "Extension pecl_event is missing\n");
+        return false;
+    }
+    if (!function_exists("inotify_init")) {
+        fprintf(STDERR, "Extension pecl_inotify is missing\n");
+        return false;
+    }
+
+    return true;
+}
+
+if (!dependancy_check())
+    exit(EXIT_FAILURE);
+
+$config = load_config();
+
 $event = new \Workerman\Events\Event();
 
 //\Workerman\Worker::$logFile = '/dev/null';
 \Workerman\Worker::$stdoutFile = 'out.log';
 \Workerman\Worker::$globalEvent = $event;
-$worker = new \Workerman\Worker("websocket://0.0.0.0:64447");
+$worker = new \Workerman\Worker("websocket://0.0.0.0:" . $config['listen_port']);
 
 $connections = array();
 
