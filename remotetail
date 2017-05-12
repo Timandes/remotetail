@@ -106,7 +106,7 @@ $worker->onMessage = function($connection, $data) use(&$connections, $event) {
         return;
     }
     echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;
-    $fileReader = new FileReader($event, $connection, $path);
+    $fileReader = new remotetail\FileReader($event, $connection, $path);
     $connections[$connection->id] = array($connection, $fileReader);
     $fileReader->beginSurveillance();
 };

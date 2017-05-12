@@ -2,3 +2,6 @@
 vendor/
 composer.lock
 
+# Misc
+remotetail.conf
+out.log
