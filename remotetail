@@ -41,6 +41,17 @@ function dependancy_check()
     return true;
 }
 
+function remotetail_parse_command($data)
+{
+    $a = json_decode($data, true);
+    if (is_array($a))
+        return $a;
+
+    return array(
+            'path' => $data,
+        );
+}
+
 if (!dependancy_check())
     exit(EXIT_FAILURE);
 
@@ -100,11 +111,18 @@ $worker->onBufferDrain = function($connection) use(&$connections) {
         $fileReader->onBufferDrain();
 };
 $worker->onMessage = function($connection, $data) use(&$connections, $event) {
-    $path = $data;
+    $commandMeta = remotetail_parse_command($data);
+    if (!$commandMeta) {
+        $connection->send("Fail to parse command {$data}");
+        return;
+    }
+
+    $path = $commandMeta['path'];
     if (!file_exists($path)) {
         $connection->send("Fail to find file ${path}");
         return;
     }
+
     echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;
     $fileReader = new remotetail\FileReader($event, $connection, $path);
     $connections[$connection->id] = array($connection, $fileReader);
