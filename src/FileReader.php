@@ -74,6 +74,9 @@ class FileReader
 
     public function stopSurveillance()
     {
+        if (!$this->_inotify)
+            return;
+
         $this->_eventBase->del($this->_inotify,
                 \Workerman\Events\EventInterface::EV_READ);
         inotify_rm_watch($this->_inotify, $this->_watchDescriptor);
