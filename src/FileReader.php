@@ -3,7 +3,7 @@
  * Remote Tail
  *
  * @author Timandes White <timands@gmail.com>
- * @package remotetail/remotetail
+ * @package remotetail\remotetail
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
