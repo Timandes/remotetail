@@ -126,7 +126,8 @@ $worker->onMessage = function($connection, $data) use(&$connections, $event) {
     }
 
     // Create reader
-    if (!isset($connections[$connection->id])) {
+    if (!isset($connections[$connection->id])
+            || !$connections[$connection->id][1]) {
         $fileReader = new remotetail\FileReader($event, $connection, $path);
         $connections[$connection->id] = array($connection, $fileReader);
     } else {
@@ -134,7 +135,8 @@ $worker->onMessage = function($connection, $data) use(&$connections, $event) {
         $fileReader = $a[1];
     }
 
-    if ($commandMeta['follow']) {
+    if (isset($commandMeta['follow'])
+            && $commandMeta['follow']) {
         echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;
         $fileReader->beginSurveillance();
     } else {
