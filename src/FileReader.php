@@ -79,5 +79,27 @@ class FileReader
         inotify_rm_watch($this->_inotify, $this->_watchDescriptor);
         fclose($this->_inotify);
     }
+
+    public function respondTailLines($lines)
+    {
+        $lines = (int)$lines;
+        $escapedPath = escapeshellarg($this->_path);
+        $cmd = "/usr/bin/tail -n {$lines} {$escapedPath}";
+        $buffer = null;
+        $exitCode = 0;
+        exec($cmd, $buffer, $exitCode);
+        if ($exitCode) {
+            echo "Found exitcode(#{$exitCode}) when executing '{$cmd}'\n";
+            return;
+        }
+
+        foreach ($buffer as $line) {
+            $this->_connection->send($line);
+            while ($this->_bufferFull) {
+                echo "Buffer is full, retrying in 1sec ...\n";
+                sleep(1);
+            }
+        }
+    }
 }
 

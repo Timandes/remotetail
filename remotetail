@@ -111,22 +111,37 @@ $worker->onBufferDrain = function($connection) use(&$connections) {
         $fileReader->onBufferDrain();
 };
 $worker->onMessage = function($connection, $data) use(&$connections, $event) {
+    // Parse command
     $commandMeta = remotetail_parse_command($data);
     if (!$commandMeta) {
         $connection->send("Fail to parse command {$data}");
         return;
     }
 
+    // File exists?
     $path = $commandMeta['path'];
     if (!file_exists($path)) {
         $connection->send("Fail to find file ${path}");
         return;
     }
 
-    echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;
-    $fileReader = new remotetail\FileReader($event, $connection, $path);
-    $connections[$connection->id] = array($connection, $fileReader);
-    $fileReader->beginSurveillance();
+    // Create reader
+    if (!isset($connections[$connection->id])) {
+        $fileReader = new remotetail\FileReader($event, $connection, $path);
+        $connections[$connection->id] = array($connection, $fileReader);
+    } else {
+        $a = $connections[$connection->id];
+        $fileReader = $a[1];
+    }
+
+    if ($commandMeta['follow']) {
+        echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;
+        $fileReader->beginSurveillance();
+    } else {
+        if (!isset($commandMeta['lines']))
+            $commandMeta['lines'] = 20;
+        $fileReader->respondTailLines($commandMeta['lines']);
+    }
 };
 
 \Workerman\Worker::runAll();
