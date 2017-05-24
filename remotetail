@@ -64,6 +64,9 @@ function remotetail_path_in_white_list($path)
     if ($dirPath == '/')
         return false;
 
+    if (in_array($dirPath, $config['path_white_list']))
+        return true;
+
     return remotetail_path_in_white_list($dirPath);
 }
 
