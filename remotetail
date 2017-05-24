@@ -52,6 +52,21 @@ function remotetail_parse_command($data)
         );
 }
 
+function remotetail_path_in_white_list($path)
+{
+    global $config;
+
+    if (!isset($config['path_white_list'])
+            || !$config['path_white_list'])
+        return true;// All pass
+
+    $dirPath = dirname($path);
+    if ($dirPath == '/')
+        return false;
+
+    return remotetail_path_in_white_list($dirPath);
+}
+
 if (!dependancy_check())
     exit(EXIT_FAILURE);
 
@@ -122,6 +137,12 @@ $worker->onMessage = function($connection, $data) use(&$connections, $event) {
     $path = $commandMeta['path'];
     if (!file_exists($path)) {
         $connection->send("Fail to find file ${path}");
+        return;
+    }
+
+    // In white list?
+    if (!remotetail_path_in_white_list($path)) {
+        $connection->send("Permission denied #1");
         return;
     }
 

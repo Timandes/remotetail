@@ -9,3 +9,8 @@
 
 /** @var int Port number */
 $config['listen_port'] = 8080;
+
+/** @var array White List of Paths */
+$config['path_white_list'] = array(
+        '/var/log',
+    );
