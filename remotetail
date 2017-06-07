@@ -159,6 +159,10 @@ $worker->onMessage = function($connection, $data) use(&$connections, $event) {
         $fileReader = $a[1];
     }
 
+    // Filter by
+    if (isset($commandMeta['filterBy']))
+        $fileReader->setFilterBy($commandMeta['filterBy']);
+
     if (isset($commandMeta['follow'])
             && $commandMeta['follow']) {
         echo "Connection #" . $connection->id . " begins to surveille file {$path}" . PHP_EOL;

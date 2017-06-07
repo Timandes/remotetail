@@ -22,6 +22,9 @@ class FileReader
     private $_watchDescriptor = 0;
     private $_bufferFull = false;
 
+    /** @var string Filter every line by */
+    private $_filterBy = null;
+
     public function __construct($eventBase, $connection, $path)
     {
         $this->_path = $path;
@@ -53,7 +56,8 @@ class FileReader
         fseek($fp, $this->_currentPos);
         while(!feof($fp)) {
             $line = fgets($fp);
-            $this->_connection->send($line);
+            if ($this->contains($line))
+                $this->_connection->send($line);
             if ($this->_bufferFull) {
                 echo "Buffer is full, stop reading\n";
                 break;
@@ -97,12 +101,36 @@ class FileReader
         }
 
         foreach ($buffer as $line) {
-            $this->_connection->send($line);
+            if ($this->contains($line))
+                $this->_connection->send($line);
             while ($this->_bufferFull) {
                 echo "Buffer is full, retrying in 1sec ...\n";
                 sleep(1);
             }
         }
+    }
+
+    /**
+     * Set filter-by string
+     *
+     * @param string $filterBy
+     */
+    public function setFilterBy($filterBy)
+    {
+        $this->_filterBy = $filterBy;
+    }
+
+    /**
+     * Contains what we need?
+     *
+     * @return bool
+     */
+    private function contains($line)
+    {
+        if (!$this->_filterBy)
+            return true;
+
+        return ((false === strpos($line, $this->_filterBy))?false:true);
     }
 }
 
