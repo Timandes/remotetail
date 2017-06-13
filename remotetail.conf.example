@@ -14,3 +14,9 @@ $config['listen_port'] = 8080;
 $config['path_white_list'] = array(
         '/var/log',
     );
+
+/** @var string Path of PID file */
+$config['pid_file'] = '/var/run/remotetail.pid';
+
+/** @var string Path of Log file */
+$config['stdout_file'] = '/var/log/remotetail.log';

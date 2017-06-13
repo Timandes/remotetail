@@ -78,7 +78,10 @@ $config = load_config();
 $event = new \Workerman\Events\Event();
 
 //\Workerman\Worker::$logFile = '/dev/null';
-\Workerman\Worker::$stdoutFile = 'out.log';
+if (isset($config['pid_file']))
+    \Workerman\Worker::$pidFile = $config['pid_file'];
+if (isset($config['stdout_file']))
+    \Workerman\Worker::$stdoutFile = $config['stdout_file'];
 \Workerman\Worker::$globalEvent = $event;
 $worker = new \Workerman\Worker("websocket://0.0.0.0:" . $config['listen_port']);
 
