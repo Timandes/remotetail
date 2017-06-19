@@ -17,14 +17,19 @@ if (!defined('EXIT_FAILURE'))
 
 function load_config()
 {
-    $path = __DIR__ . '/remotetail.conf';
-    if (!file_exists($path)) {
-        fprintf(STDERR, "Could not find file %s\n", $path);
-        return false;
+    $configDirs = array(
+            __DIR__, '/etc',
+        );
+    foreach ($configDirs as $dir) {
+        $path = $dir . '/remotetail.conf';
+        if (file_exists($path)) {
+            include $path;
+            return $config;
+        }
     }
-    include $path;
 
-    return $config;
+    fprintf(STDERR, "Could not find file config file\n");
+    return false;
 }
 
 function dependancy_check()
