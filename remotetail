@@ -87,6 +87,8 @@ if (isset($config['pid_file']))
     \Workerman\Worker::$pidFile = $config['pid_file'];
 if (isset($config['stdout_file']))
     \Workerman\Worker::$stdoutFile = $config['stdout_file'];
+if (isset($config['log_file']))
+    \Workerman\Worker::$logFile = $config['log_file'];
 \Workerman\Worker::$globalEvent = $event;
 $worker = new \Workerman\Worker("websocket://0.0.0.0:" . $config['listen_port']);
 

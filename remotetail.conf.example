@@ -18,5 +18,8 @@ $config['path_white_list'] = array(
 /** @var string Path of PID file */
 $config['pid_file'] = '/var/run/remotetail.pid';
 
+/** @var string Path of file to store lines to stdout & stderr */
+$config['stdout_file'] = '/var/log/remotetail.err';
+
 /** @var string Path of Log file */
-$config['stdout_file'] = '/var/log/remotetail.log';
+$config['log_file'] = '/var/log/remotetail.log';
